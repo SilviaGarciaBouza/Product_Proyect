@@ -2,7 +2,7 @@ package com.example.mi_web_backend.model;
 
 // src/main/java/com/example/mi_web_backend/model/Product.java
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

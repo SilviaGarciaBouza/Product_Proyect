@@ -5,36 +5,31 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.2</version> <relativePath/>
+		<version>2.7.18</version> <relativePath/>
 	</parent>
+
 	<groupId>com.example</groupId>
 	<artifactId>mi-web-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Artifact</name>
 	<description>Demo project for Spring Boot</description>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+
 	<properties>
-		<java.version>17</java.version> </properties>
+		<java.version>11</java.version> <hsqldatabase.path>src/main/resources/db</hsqldatabase.path>
+		<database.url>jdbc:hsqldb:hsqli://localhost:9013/templateDB</database.url>
+		<maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
+		<exec-maven-plugin.version>1.2.1</exec-maven-plugin.version>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
 		<dependency>
@@ -42,6 +37,7 @@
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -49,27 +45,21 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>2.7.2</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</path>
-					</annotationProcessorPaths>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -82,7 +72,77 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version> <configuration>
+				<source>${java.version}</source> <target>${java.version}</target> <annotationProcessorPaths>
+				<path>
+					<groupId>org.projectlombok</groupId>
+					<artifactId>lombok</artifactId>
+					<version>1.18.24</version>
+				</path>
+			</annotationProcessorPaths>
+			</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.3.1</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>run_database</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>${maven-antrun-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>configure_database</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<available file="${hsqldatabase.path}/templateDB.script" property="database.exist"/>
+										<echo message="${hsqldatabase.path}/templateDB.script"/>
+										<copy tofile="${hsqldatabase.path}/templateDB.script" file="${hsqldatabase.path}/templateDB.txt" overwrite="true"/>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>${exec-maven-plugin.version}</version>
+						<configuration>
+							<mainClass>org.hsqldb.Server</mainClass>
+							<arguments>
+								<argument>--port</argument>
+								<argument>9013</argument>
+								<argument>--database.0</argument>
+								<argument>${hsqldatabase.path}/templateDB</argument>
+								<argument>--dbname.0</argument>
+								<argument>templateDB</argument>
+							</arguments>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>

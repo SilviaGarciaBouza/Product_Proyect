@@ -1,7 +1,9 @@
 package com.example.mi_web_backend.model;
 
 
-import jakarta.persistence.*;
+import javax.persistence.*;
+
+
 
 @Entity
 @Table(name = "company")
